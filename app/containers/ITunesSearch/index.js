@@ -2,7 +2,7 @@ import React, { useEffect, memo, useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
-import { OutlinedInput, InputAdornment, IconButton, CircularProgress, Paper } from '@mui/material';
+import { OutlinedInput, InputAdornment, IconButton, CircularProgress, Paper, Grid } from '@mui/material';
 import { Search as SearchIcon, Clear as ClearIcon } from '@mui/icons-material';
 import styled from '@emotion/styled';
 import { injectReducer, injectSaga } from 'redux-injectors';
@@ -12,6 +12,7 @@ import { searchTracks, clearTracks } from './actions';
 import { selectTracks, selectLoading, selectError } from './selectors';
 import reducer from './reducer';
 import saga from './saga';
+import SongCard from '@app/components/SongCard';
 
 const Container = styled.div`
   display: flex;
@@ -29,6 +30,37 @@ const SearchContainer = styled(Paper)`
     padding: 2rem;
     border-radius: 20px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+  }
+`;
+
+const ResultsContainer = styled(Paper)`
+  && {
+    width: 100%;
+    padding: 2rem;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    max-height: calc(100vh - 250px);
+    overflow-y: auto;
+
+    /* Custom scrollbar */
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: rgba(147, 51, 234, 0.5);
+      border-radius: 4px;
+
+      &:hover {
+        background: rgba(147, 51, 234, 0.7);
+      }
+    }
   }
 `;
 
@@ -44,9 +76,16 @@ const StyledOutlinedInput = styled(OutlinedInput)`
 `;
 
 const ErrorMessage = styled.div`
-  color: red;
+  color: ${({ theme }) => theme.palette.error.main};
   margin-top: 1rem;
   text-align: center;
+`;
+
+const Title = styled.h1`
+  color: ${({ theme }) => theme.palette.primary.main};
+  margin-bottom: 2rem;
+  text-align: center;
+  font-size: 2rem;
 `;
 
 const LoaderContainer = styled.div`
@@ -55,13 +94,6 @@ const LoaderContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-`;
-
-const Title = styled.h1`
-  color: ${({ theme }) => theme.palette.primary.main};
-  margin-bottom: 2rem;
-  text-align: center;
-  font-size: 2rem;
 `;
 
 /**
@@ -147,9 +179,19 @@ export function ITunesSearch({ dispatchSearchTracks, dispatchClearTracks, tracks
           }
         />
         {error && <ErrorMessage>Error: {error.message}</ErrorMessage>}
-        {/* Track list will be implemented in Part 2 */}
-        <pre>{JSON.stringify(tracks, null, 2)}</pre>
       </SearchContainer>
+
+      {/* {tracks.length > 0 && (
+        <ResultsContainer>
+          <Grid container spacing={3}>
+            {tracks.map((track) => (
+              <Grid item xs={12} sm={6} md={4} lg={3} key={track.trackId}>
+                <SongCard track={track} />
+              </Grid>
+            ))}
+          </Grid>
+        </ResultsContainer>
+      )} */}
     </Container>
   );
 }
@@ -162,7 +204,8 @@ ITunesSearch.propTypes = {
       trackId: PropTypes.number,
       trackName: PropTypes.string,
       artistName: PropTypes.string,
-      artworkUrl100: PropTypes.string
+      artworkUrl100: PropTypes.string,
+      previewUrl: PropTypes.string
     })
   ),
   loading: PropTypes.bool,
