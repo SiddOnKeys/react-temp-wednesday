@@ -19,7 +19,6 @@ import { ThemeProvider as MUIThemeProvider, createTheme, StyledEngineProvider } 
 import { Global } from '@emotion/react';
 import { routeConfig } from '@app/routeConfig';
 import globalStyles from '@app/global-styles';
-import { Header } from '@components/Header';
 import { ScrollToTop } from '@components/ScrollToTop';
 import { For } from '@components/For';
 import { If } from '@app/components/If';
@@ -29,21 +28,21 @@ import { translationMessages } from '@app/i18n';
 import history from '@utils/history';
 import { SCREEN_BREAK_POINTS } from '@utils/constants';
 import configureStore from '@app/configureStore';
-import { colors } from '@themes';
 
 export const theme = createTheme({
   palette: {
     primary: {
-      main: colors.primary
+      main: '#9c27b0' // Material-UI's purple
     },
     secondary: {
-      main: colors.secondary
+      main: '#000000' // Black
     }
   },
   breakpoints: {
     values: SCREEN_BREAK_POINTS
   }
 });
+
 /**
  * App component that sets up the application with routing, theme, and language support.
  * It also handles redirect logic based on the query parameters in the URL.
@@ -79,7 +78,6 @@ export function App() {
                     <MUIThemeProvider theme={theme}>
                       <CssBaseline />
                       <Global styles={globalStyles} />
-                      <Header />
                       <Container>
                         <For
                           ParentComponent={(props) => <Switch {...props} />}
@@ -114,8 +112,10 @@ export function App() {
     </If>
   );
 }
+
 App.propTypes = {
   location: PropTypes.object,
   history: PropTypes.object
 };
+
 export default App;
