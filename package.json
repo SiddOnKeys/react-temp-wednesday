@@ -209,6 +209,7 @@
     "html-loader": "2.1.2",
     "html-webpack-plugin": "^5.5.0",
     "http-server": "^14.1.1",
+    "husky": "^9.1.7",
     "image-webpack-loader": "^8.1.0",
     "imagemin": "^8.0.1",
     "imagemin-webp": "^8.0.0",
