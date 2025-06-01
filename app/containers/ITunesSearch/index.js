@@ -2,9 +2,7 @@ import React, { useEffect, memo, useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
-import { OutlinedInput, InputAdornment, IconButton, CircularProgress, Paper, Grid } from '@mui/material';
-import { Search as SearchIcon, Clear as ClearIcon } from '@mui/icons-material';
-import styled from '@emotion/styled';
+import { Paper } from '@mui/material';
 import { injectReducer, injectSaga } from 'redux-injectors';
 import { compose } from 'redux';
 import debounce from 'lodash/debounce';
@@ -12,95 +10,13 @@ import { searchTracks, clearTracks } from './actions';
 import { selectTracks, selectLoading, selectError } from './selectors';
 import reducer from './reducer';
 import saga from './saga';
-import SongCard from '@app/components/SongCard';
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  min-height: 100vh;
-  padding: 2rem;
-`;
-
-const SearchContainer = styled(Paper)`
-  && {
-    width: 100%;
-    max-width: 600px;
-    padding: 2rem;
-    border-radius: 20px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    margin-bottom: 2rem;
-  }
-`;
-
-const ResultsContainer = styled(Paper)`
-  && {
-    width: 100%;
-    padding: 2rem;
-    border-radius: 20px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    max-height: calc(100vh - 250px);
-    overflow-y: auto;
-
-    /* Custom scrollbar */
-    &::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.1);
-      border-radius: 4px;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: rgba(147, 51, 234, 0.5);
-      border-radius: 4px;
-
-      &:hover {
-        background: rgba(147, 51, 234, 0.7);
-      }
-    }
-  }
-`;
-
-const StyledOutlinedInput = styled(OutlinedInput)`
-  && {
-    margin: 1rem 0;
-    border-radius: 25px;
-
-    & .MuiOutlinedInput-notchedOutline {
-      border-radius: 25px;
-    }
-  }
-`;
-
-const ErrorMessage = styled.div`
-  color: ${({ theme }) => theme.palette.error.main};
-  margin-top: 1rem;
-  text-align: center;
-`;
-
-const Title = styled.h1`
-  color: ${({ theme }) => theme.palette.primary.main};
-  margin-bottom: 2rem;
-  text-align: center;
-  font-size: 2rem;
-`;
-
-const LoaderContainer = styled.div`
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
+import SearchInput from './components/SearchInput';
+import TrackGrid from './components/TrackGrid';
+import containerStyles from './styles/Container.css';
 
 /**
- * ITunesSearch Component
- * This component provides a search interface for iTunes tracks
- * with real-time search functionality and error handling
- *
+ * ITunesSearch Container Component
+ * Provides a search interface for iTunes tracks with real-time search functionality
  * @param {Object} props - Component props
  * @param {Function} props.dispatchSearchTracks - Function to dispatch search action
  * @param {Function} props.dispatchClearTracks - Function to clear search results
@@ -111,7 +27,10 @@ const LoaderContainer = styled.div`
 export function ITunesSearch({ dispatchSearchTracks, dispatchClearTracks, tracks, loading, error }) {
   const [inputValue, setInputValue] = useState('');
 
-  // Create a debounced version of the search dispatch
+  /**
+   * Creates a debounced version of the search function
+   * @param {string} searchQuery - The search term to look up
+   */
   const debouncedSearch = useCallback(
     debounce((searchQuery) => {
       if (searchQuery.trim()) {
@@ -123,20 +42,31 @@ export function ITunesSearch({ dispatchSearchTracks, dispatchClearTracks, tracks
     [dispatchSearchTracks, dispatchClearTracks]
   );
 
+  /**
+   * Effect to handle cleanup on component unmount
+   * Cancels any pending debounced searches and clears the track list
+   */
   useEffect(() => {
-    // Cleanup on unmount
     return () => {
       debouncedSearch.cancel();
       dispatchClearTracks();
     };
   }, [debouncedSearch]);
 
+  /**
+   * Handles changes to the search input
+   * @param {React.ChangeEvent<HTMLInputElement>} event - The input change event
+   */
   const handleInputChange = (event) => {
     const newValue = event.target.value;
-    setInputValue(newValue); // Update input state immediately
-    debouncedSearch(newValue); // Debounce the search
+    setInputValue(newValue);
+    debouncedSearch(newValue);
   };
 
+  /**
+   * Handles manual search button clicks
+   * Cancels any pending debounced searches and performs immediate search
+   */
   const handleSearchClick = () => {
     debouncedSearch.cancel();
     if (inputValue.trim()) {
@@ -144,6 +74,10 @@ export function ITunesSearch({ dispatchSearchTracks, dispatchClearTracks, tracks
     }
   };
 
+  /**
+   * Handles clearing the search input
+   * Cancels any pending searches and clears the results
+   */
   const handleClear = () => {
     setInputValue('');
     debouncedSearch.cancel();
@@ -151,48 +85,23 @@ export function ITunesSearch({ dispatchSearchTracks, dispatchClearTracks, tracks
   };
 
   return (
-    <Container>
-      <SearchContainer elevation={3}>
-        <Title>iTunes Track Search</Title>
-        <StyledOutlinedInput
-          placeholder="Search for tracks..."
-          onChange={handleInputChange}
+    <div className={containerStyles.mainContainer}>
+      <Paper className={containerStyles.searchContainer} elevation={0}>
+        <h1 className={containerStyles.title}>iTunes Search</h1>
+        <SearchInput
           value={inputValue}
-          fullWidth
-          endAdornment={
-            <InputAdornment position="end">
-              {inputValue && (
-                <IconButton edge="end" onClick={handleClear} size="small">
-                  <ClearIcon />
-                </IconButton>
-              )}
-              <IconButton edge="end" onClick={handleSearchClick} disabled={loading}>
-                {loading ? (
-                  <LoaderContainer>
-                    <CircularProgress color="primary" size={20} />
-                  </LoaderContainer>
-                ) : (
-                  <SearchIcon />
-                )}
-              </IconButton>
-            </InputAdornment>
-          }
+          onChange={handleInputChange}
+          onClear={handleClear}
+          onSearch={handleSearchClick}
+          loading={loading}
         />
-        {error && <ErrorMessage>Error: {error.message}</ErrorMessage>}
-      </SearchContainer>
+        {error && <div className={containerStyles.errorMessage}>Error: {error.message}</div>}
+      </Paper>
 
-      {/* {tracks.length > 0 && (
-        <ResultsContainer>
-          <Grid container spacing={3}>
-            {tracks.map((track) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={track.trackId}>
-                <SongCard track={track} />
-              </Grid>
-            ))}
-          </Grid>
-        </ResultsContainer>
-      )} */}
-    </Container>
+      <Paper className={containerStyles.resultsContainer} elevation={0}>
+        <TrackGrid tracks={tracks} loading={loading} />
+      </Paper>
+    </div>
   );
 }
 
@@ -220,6 +129,10 @@ ITunesSearch.defaultProps = {
   error: null
 };
 
+/**
+ * Maps Redux state to component props using reselect
+ * @returns {Object} Object containing tracks, loading, and error state
+ */
 const mapStateToProps = createStructuredSelector({
   tracks: selectTracks,
   loading: selectLoading,

@@ -5,7 +5,16 @@ import wretch from 'wretch';
  */
 export const ITUNES_BASE_URL = 'https://itunes.apple.com';
 
-// Create iTunes API client
+/**
+ * Configured iTunes API client with error handling
+ * @type {Object} Wretch instance configured for iTunes API
+ * @property {Function} get - HTTP GET request method
+ * @property {Function} post - HTTP POST request method
+ * @returns {Promise<Object>} Response object with the following structure:
+ * @returns {boolean} .ok - Whether the request was successful
+ * @returns {number} .status - HTTP status code
+ * @returns {Object} .data - Response data from iTunes API
+ */
 const itunesApi = wretch(ITUNES_BASE_URL)
   .headers({ 'Content-Type': 'application/json' })
   .resolve(async (resolver) => {
@@ -29,6 +38,6 @@ const itunesApi = wretch(ITUNES_BASE_URL)
 /**
  * Search for tracks in iTunes
  * @param {string} query - The search term
- * @returns {Promise} API response with track results
+ * @returns {Promise<Object>} API response with track results
  */
 export const searchTracks = (query) => itunesApi.get(`/search?term=${encodeURIComponent(query)}&entity=song&limit=20`);

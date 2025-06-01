@@ -11,7 +11,6 @@ import React, { useEffect, useState } from 'react';
 import { Switch, Route } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { Router } from 'react-router';
-import map from 'lodash/map';
 import { PersistGate } from 'redux-persist/integration/react';
 import { Provider } from 'react-redux';
 import { CssBaseline, Container } from '@mui/material';
@@ -47,6 +46,7 @@ const StyledContainer = styled(Container)`
   min-height: 100vh;
   position: relative;
   z-index: 1;
+  padding: 0 !important;
 `;
 
 export const theme = createTheme({
@@ -132,21 +132,25 @@ export function App() {
                       <Global styles={globalStyles} />
                       <>
                         <BlurredBackground />
-                        <StyledContainer>
+                        <StyledContainer maxWidth={false} disableGutters>
                           <For
                             ParentComponent={(props) => <Switch {...props} />}
-                            of={map(Object.keys(routeConfig))}
+                            of={Object.keys(routeConfig)}
                             renderItem={(routeKey, index) => {
-                              const Component = routeConfig[routeKey].component;
+                              if (!Object.prototype.hasOwnProperty.call(routeConfig, routeKey)) {
+                                return null;
+                              }
+                              const route = routeConfig[routeKey];
+                              const Component = route.component;
                               return (
                                 <Route
-                                  exact={routeConfig[routeKey].exact}
+                                  exact={route.exact}
                                   key={index}
-                                  path={routeConfig[routeKey].route}
+                                  path={route.route}
                                   render={(props) => {
                                     const updatedProps = {
                                       ...props,
-                                      ...routeConfig[routeKey].props
+                                      ...route.props
                                     };
                                     return <Component {...updatedProps} />;
                                   }}
