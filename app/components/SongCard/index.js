@@ -79,7 +79,7 @@ function SongCard({ track }) {
 
   return (
     <>
-      <Card className={styles.card} onClick={handleCardClick} sx={{ cursor: 'pointer' }}>
+      <Card className={styles.card} onClick={handleCardClick} sx={{ cursor: 'pointer' }} data-testid="song-card">
         <CardMedia
           className={styles.cardMedia}
           component="img"

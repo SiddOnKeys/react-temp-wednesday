@@ -24,11 +24,16 @@ const SearchInput = ({ value, onChange, onClear, onSearch, loading }) => {
       endAdornment={
         <InputAdornment position="end">
           {value && (
-            <IconButton className={inputStyles.iconButton} onClick={onClear} size="small">
+            <IconButton className={inputStyles.iconButton} onClick={onClear} size="small" aria-label="Clear search">
               <ClearIcon />
             </IconButton>
           )}
-          <IconButton className={inputStyles.iconButton} onClick={onSearch} disabled={loading}>
+          <IconButton
+            className={inputStyles.iconButton}
+            onClick={onSearch}
+            disabled={loading}
+            aria-label="Search tracks"
+          >
             {loading ? (
               <div className={inputStyles.loaderContainer}>
                 <CircularProgress size={20} sx={{ color: '#ffffff' }} />

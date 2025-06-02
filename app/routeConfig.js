@@ -2,20 +2,14 @@
  * Route configuration
  */
 
-import HomeContainer from '@containers/HomeContainer/loadable';
 import NotFound from '@containers/NotFoundPage/loadable';
 import ITunesSearch from '@containers/ITunesSearch/loadable';
 import TrackDetails from '@containers/TrackDetails/loadable';
 
 export const routeConfig = {
-  home: {
-    component: HomeContainer,
-    route: '/',
-    exact: true
-  },
   itunes: {
     component: ITunesSearch,
-    route: '/itunes',
+    route: '/',
     exact: true
   },
   trackDetails: {

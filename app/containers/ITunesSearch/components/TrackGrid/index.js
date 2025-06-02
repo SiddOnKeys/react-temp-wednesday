@@ -1,44 +1,43 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Grid, CircularProgress, Box } from '@mui/material';
-import SongCard from '../SongCard';
-import styles from './styles.css';
+import { Typography } from '@mui/material';
+import SongCard from '@app/components/SongCard';
+import gridStyles from '../../styles/Grid.css';
 
-function TrackGrid({ tracks, loading }) {
-  if (loading) {
-    return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
-        <CircularProgress />
-      </Box>
-    );
-  }
-
+/**
+ * Grid component for displaying track results
+ * @param {Object} props - Component props
+ * @param {Array} props.tracks - Array of track objects
+ * @param {boolean} props.loading - Loading state
+ */
+const TrackGrid = ({ tracks, loading }) => {
   return (
-    <Grid container spacing={3} className={styles.gridContainer}>
+    <div className={gridStyles.gridContainer}>
       {tracks.map((track) => (
-        <Grid item xs={12} sm={6} md={4} lg={3} key={track.trackId}>
+        <div className={gridStyles.gridItem} key={track.trackId}>
           <SongCard track={track} />
-        </Grid>
+        </div>
       ))}
-    </Grid>
+      {tracks.length === 0 && !loading && (
+        <div className={gridStyles.emptyMessage}>
+          <Typography variant="body1">Search for tracks to see results</Typography>
+        </div>
+      )}
+    </div>
   );
-}
+};
 
 TrackGrid.propTypes = {
   tracks: PropTypes.arrayOf(
     PropTypes.shape({
-      trackId: PropTypes.number.isRequired,
-      trackName: PropTypes.string.isRequired,
-      artistName: PropTypes.string.isRequired,
+      trackId: PropTypes.number,
+      trackName: PropTypes.string,
+      artistName: PropTypes.string,
       artworkUrl100: PropTypes.string,
       previewUrl: PropTypes.string
     })
   ).isRequired,
-  loading: PropTypes.bool
-};
-
-TrackGrid.defaultProps = {
-  loading: false
+  loading: PropTypes.bool.isRequired
 };
 
 export default TrackGrid;

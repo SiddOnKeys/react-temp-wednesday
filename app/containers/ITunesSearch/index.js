@@ -6,7 +6,7 @@ import { Paper } from '@mui/material';
 import { compose } from 'redux';
 import debounce from 'lodash/debounce';
 import { searchTracks, clearTracks } from './actions';
-import { selectTracks, selectLoading, selectError } from './selectors';
+import { selectTracks, selectLoading, selectError, selectQuery } from './selectors';
 import SearchInput from './components/SearchInput';
 import TrackGrid from './components/TrackGrid';
 import containerStyles from './styles/Container.css';
@@ -20,14 +20,21 @@ import containerStyles from './styles/Container.css';
  * @param {Array} props.tracks - List of tracks from search results
  * @param {boolean} props.loading - Loading state indicator
  * @param {Object} props.error - Error object if search fails
+ * @param {string} props.savedQuery - Previously saved search query
  */
-export function ITunesSearch({ dispatchSearchTracks, dispatchClearTracks, tracks, loading, error }) {
-  const [inputValue, setInputValue] = useState('');
+export function ITunesSearch({ dispatchSearchTracks, dispatchClearTracks, tracks, loading, error, savedQuery }) {
+  const [inputValue, setInputValue] = useState(savedQuery || '');
+  const [isFirstMount, setIsFirstMount] = useState(true);
 
-  // Clear tracks when component mounts
+  // Clear tracks only on first mount if there's no saved query
   useEffect(() => {
-    dispatchClearTracks();
-  }, [dispatchClearTracks]);
+    if (isFirstMount) {
+      setIsFirstMount(false);
+      if (!savedQuery) {
+        dispatchClearTracks();
+      }
+    }
+  }, [isFirstMount, savedQuery, dispatchClearTracks]);
 
   /**
    * Creates a debounced version of the search function
@@ -121,23 +128,26 @@ ITunesSearch.propTypes = {
   loading: PropTypes.bool,
   error: PropTypes.shape({
     message: PropTypes.string
-  })
+  }),
+  savedQuery: PropTypes.string
 };
 
 ITunesSearch.defaultProps = {
   tracks: [],
   loading: false,
-  error: null
+  error: null,
+  savedQuery: ''
 };
 
 /**
  * Maps Redux state to component props using reselect
- * @returns {Object} Object containing tracks, loading, and error state
+ * @returns {Object} Object containing tracks, loading, error and saved query state
  */
 const mapStateToProps = createStructuredSelector({
   tracks: selectTracks,
   loading: selectLoading,
-  error: selectError
+  error: selectError,
+  savedQuery: selectQuery
 });
 
 /**
