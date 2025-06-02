@@ -3,13 +3,10 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import { Paper } from '@mui/material';
-import { injectReducer, injectSaga } from 'redux-injectors';
 import { compose } from 'redux';
 import debounce from 'lodash/debounce';
 import { searchTracks, clearTracks } from './actions';
 import { selectTracks, selectLoading, selectError } from './selectors';
-import reducer from './reducer';
-import saga from './saga';
 import SearchInput from './components/SearchInput';
 import TrackGrid from './components/TrackGrid';
 import containerStyles from './styles/Container.css';
@@ -26,6 +23,11 @@ import containerStyles from './styles/Container.css';
  */
 export function ITunesSearch({ dispatchSearchTracks, dispatchClearTracks, tracks, loading, error }) {
   const [inputValue, setInputValue] = useState('');
+
+  // Clear tracks when component mounts
+  useEffect(() => {
+    dispatchClearTracks();
+  }, [dispatchClearTracks]);
 
   /**
    * Creates a debounced version of the search function
@@ -44,12 +46,11 @@ export function ITunesSearch({ dispatchSearchTracks, dispatchClearTracks, tracks
 
   /**
    * Effect to handle cleanup on component unmount
-   * Cancels any pending debounced searches and clears the track list
+   * Only cancels pending debounced searches
    */
   useEffect(() => {
     return () => {
       debouncedSearch.cancel();
-      dispatchClearTracks();
     };
   }, [debouncedSearch]);
 
@@ -151,9 +152,4 @@ export function mapDispatchToProps(dispatch) {
   };
 }
 
-export default compose(
-  injectReducer({ key: 'itunesSearch', reducer }),
-  injectSaga({ key: 'itunesSearch', saga }),
-  connect(mapStateToProps, mapDispatchToProps),
-  memo
-)(ITunesSearch);
+export default compose(connect(mapStateToProps, mapDispatchToProps), memo)(ITunesSearch);

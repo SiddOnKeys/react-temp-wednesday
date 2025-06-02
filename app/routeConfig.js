@@ -1,19 +1,30 @@
-import routeConstants from '@utils/routeConstants';
-import NotFound from '@app/containers/NotFoundPage/loadable';
-import HomeContainer from '@app/containers/HomeContainer/loadable';
-import ITunesSearch from '@app/containers/ITunesSearch/loadable';
+/**
+ * Route configuration
+ */
+
+import HomeContainer from '@containers/HomeContainer/loadable';
+import NotFound from '@containers/NotFoundPage/loadable';
+import ITunesSearch from '@containers/ITunesSearch/loadable';
+import TrackDetails from '@containers/TrackDetails/loadable';
 
 export const routeConfig = {
+  home: {
+    component: HomeContainer,
+    route: '/',
+    exact: true
+  },
   itunes: {
     component: ITunesSearch,
-    ...routeConstants.itunes
+    route: '/itunes',
+    exact: true
   },
-  repos: {
-    component: HomeContainer,
-    ...routeConstants.repos
+  trackDetails: {
+    component: TrackDetails,
+    route: '/tracks/:trackId',
+    exact: true
   },
   notFoundPage: {
     component: NotFound,
-    route: '/'
+    route: ''
   }
 };

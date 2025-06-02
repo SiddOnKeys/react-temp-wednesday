@@ -37,7 +37,7 @@ const BlurredBackground = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, rgba(76, 0, 130, 0.4) 0%, rgba(147, 51, 234, 0.4) 100%);
+  background: linear-gradient(135deg, rgb(107 29 163 / 17%) 0%, rgb(70 7 127 / 40%) 100%);
   backdrop-filter: blur(10px);
   z-index: -1;
 `;
@@ -53,7 +53,7 @@ export const theme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      main: '#9333EA', // Bright violet
+      main: '#2D1B69', // Bright violet
       light: '#A855F7',
       dark: '#7E22CE'
     },

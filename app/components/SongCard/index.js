@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { useHistory } from 'react-router-dom';
 import {
   Card,
   CardContent,
@@ -31,6 +32,7 @@ import styles from './styles.css';
  * @returns {JSX.Element} SongCard component
  */
 function SongCard({ track }) {
+  const history = useHistory();
   const [isPlaying, setIsPlaying] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [audio, setAudio] = useState(null);
@@ -62,6 +64,10 @@ function SongCard({ track }) {
     setDetailsOpen(false);
   }, []);
 
+  const handleCardClick = useCallback(() => {
+    history.push(`/tracks/${track.trackId}`);
+  }, [history, track.trackId]);
+
   useEffect(() => {
     return () => {
       if (audio) {
@@ -73,7 +79,7 @@ function SongCard({ track }) {
 
   return (
     <>
-      <Card className={styles.card}>
+      <Card className={styles.card} onClick={handleCardClick} sx={{ cursor: 'pointer' }}>
         <CardMedia
           className={styles.cardMedia}
           component="img"
@@ -169,6 +175,7 @@ function SongCard({ track }) {
 
 SongCard.propTypes = {
   track: PropTypes.shape({
+    trackId: PropTypes.number.isRequired,
     trackName: PropTypes.string.isRequired,
     artistName: PropTypes.string.isRequired,
     artworkUrl100: PropTypes.string.isRequired,

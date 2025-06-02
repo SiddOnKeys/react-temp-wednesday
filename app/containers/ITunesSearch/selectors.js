@@ -31,3 +31,14 @@ export const selectError = createSelector(selectITunesSearchDomain, (substate) =
  * @returns {string} Current search term
  */
 export const selectQuery = createSelector(selectITunesSearchDomain, (substate) => substate.query);
+
+/**
+ * Creates a selector to find a track by ID
+ * @returns {Function} Selector that takes state and trackId and returns matching track
+ */
+export const makeSelectTrackById = () =>
+  createSelector(
+    selectTracks,
+    (_, trackId) => trackId,
+    (tracks, trackId) => tracks.find((track) => track.trackId === Number(trackId))
+  );
